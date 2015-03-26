@@ -48,52 +48,52 @@ int CONP::getNextElement(string exp,string &buffer, int &position,bool ONP)
 	while(i < exp.length() && (exp[i] == ' ' || exp[i] == '\t'))
 		i++;
 
-	// sprawdzamy czy znak jest operatorem
-	if(!isdigit(exp[i]) && exp[i] != '.') // jezeli jest sprawdzamy czy nie jest to operator jednoargumentowy + -
-		// nie jest to pierwszy znak wyrazenia oraz czy nie jest to operator jednoargumentowy np -6
+	
+	if(!isdigit(exp[i]) && exp[i] != '.') 
+		
 		if((i == 0 && (exp[i] == '-' || exp[i] == '+')) || (i > 0 && (exp[i] == '-' || exp[i] == '+') && ((exp[i-1] == ' ' || exp[i-1] == '(') && (i+1) < exp.length() && isdigit(exp[i+1]) )  ))
-			i++; // jeœl ipowyzszy warunek jest spelniony to musimy potraktowaæ ci¹g jako liczbê z operatorem jednoarguemtnowym np -11 , wiêc i++
-		else // a jezeli nie jest jednoargumentowy to jest dwuargumentowy
+			i++; 
+		else 
 	{ 
-		position = i+1; // zwieksz pozycje 
-		buffer = exp[i]; // zapisz operator do bufora
-		buffer+=' '; // dodaj odstep
-		if(exp[i] == '(') // jezeli operator jest lewym nawiasem zwroc
-			return LB; // zwroc LN
-		else if(exp[i] == ')') // a jezeli prawym to
-			return RB; // zwroc LN
-		else // a jezeli nie jest nawiasem
-		return OPERATOR; // zwracamy sygnal ze pobralismy OPERATOR zwykly
+		position = i+1; 
+		buffer = exp[i]; 
+		buffer+=' '; 
+		if(exp[i] == '(') 
+			return LB; 
+		else if(exp[i] == ')') 
+			return RB; 
+		else 
+		return OPERATOR; 
 	}
 
-	// blok dla przypadku napotkania liczby
+	
 	if(i < exp.length() && isdigit(exp[i]))
 	{
 	{
-		// sprawdzamy czy przed znakiem nie stoi operator jednoargumentowy 
+		
 		if((i == 1 && (exp[0] == '-' || exp[0] == '+')) || ( i > 1 && (exp[i-1] == '-' || exp[i-1] == '+')  && (exp[i-2] == ' ' || exp[i-2] == '(')))
 		{
-			if((i == 1 && exp[0] == '-') || exp[i-1] == '-') // jezeli jesto to minus
-				buffer += '-'; // to zapisujemy go w buforze bo mamy do czyneinia z ujemna liczba
-			else ; // jezeli jest to plus to nie musimy nic robiæ
+			if((i == 1 && exp[0] == '-') || exp[i-1] == '-') 
+				buffer += '-'; 
+			else ; 
 		}
 
-		while(isdigit(exp[i])) // dopóki kolejne znaki s¹ cyframi
-			buffer+= exp[i++]; // zapisujemy je do bufora
+		while(isdigit(exp[i])) 
+			buffer+= exp[i++]; 
 	}
 	
-	if(i < exp.length() && exp[i] == '.') // jezeli napotkamy kropke
-		buffer+=exp[i++];// zapisujemy ja do bufora 
-	while(i < exp.length() && isdigit(exp[i])) // jezeli sa cyfry po kropce to przepisujemy je
-		buffer+=exp[i++]; // do bufora
+	if(i < exp.length() && exp[i] == '.') 
+		buffer+=exp[i++];
+	while(i < exp.length() && isdigit(exp[i])) 
+		buffer+=exp[i++]; 
 
-	position = i; // uaktualniamy pozycje 
-	buffer+=' '; // dodajemy odstep do bufora dla czytelnosci
-	return NUMBER; // zwracamy ze pobralismy liczbe
+	position = i; 
+	buffer+=' '; 
+	return NUMBER; 
 	}
 	position = i;
-	return EOS; // jezeli zaden z powyzszych warunkow nie zosta³ spe³niony to odczytano
-	           // ostatni znak, ktory jest bialym znakiem
+	return EOS; 
+	           
 }
 /**
 * Przekszta³ca wyra¿enie w notacji infiksowej do wyra¿enia w notacji ONP.
@@ -109,49 +109,49 @@ int CONP::infixToONP(string infix,string &onp)
 	string buffer,buffer2;
 	int assoc,assoc2;
 
-	// dopoki jestesmy w obrebie wyrazenia
+	
 	while(position < infix.length())
 	{
-		// w zaleznosci od tego co pobrala funkcja getNextElement
+		
 		result = getNextElement(infix,buffer,position,0);
 
 		switch(result)
 		{
-			case NUMBER: // jezeli pobrala liczbe
-				onp += buffer;//dajemy na wyjœcie
+			case NUMBER: 
+				onp += buffer;
 				break;
 			
-			case OPERATOR : // jezeli operator
-			// dopóki na stackie znajduje sie operator ktorego kolejnosc(getPrior) wykonywania
-			// jest wieksza niz aktualnei pobranego
+			case OPERATOR : 
+			
+			
 				while(stack.look(buffer2) && buffer2.compare("( ") && buffer2.compare(") ") &&
 					(getPrior(buffer.substr(0,buffer.length()-1),assoc) <= getPrior(buffer2.substr(0,buffer2.length()-1),assoc2) 
 					&& assoc == LEFT_ASSOC )
 					|| getPrior(buffer.substr(0,buffer.length()-1),assoc) < getPrior(buffer2.substr(0,buffer2.length()-1),assoc2) 
 					&& assoc == RIGHT_ASSOC )
 				{
-					stack.pop(buffer2); // zdejmij operator ze stosu
-					onp+= buffer2; // i dodaj na onpjscie
+					stack.pop(buffer2); 
+					onp+= buffer2; 
 				}
-				stack.push(buffer); // dodaj aktualny operator na stos
+				stack.push(buffer); 
 				break;
 			
 			case LB:
-				stack.push(buffer); // wstaw go na stos
+				stack.push(buffer); 
 			break;
 		
-			case RB :// jezeli prawy nawias to
+			case RB :
 				buffer2[0] = 0;
-				while(buffer2[0] != '(') //az do napotkania lewego nawiasu
+				while(buffer2[0] != '(') 
 				{
-					if(!stack.pop(buffer2)) // zdejmuj operatory ze stosu
-						return ERROR; // jezeli nie napotkano lewego nawiasu a stos pusty tzn ze wyrazenie zle skonstruowane zwroc BLAD
+					if(!stack.pop(buffer2)) 
+						return ERROR; 
 					if(buffer2[0] != '(')
-						onp+= buffer2; // doloz pobrany ze stosu operator na wyjœcie
+						onp+= buffer2; 
 				}
 				break;
-			case ERROR: // jezeli funkcja getNextElement napotkala blad to 
-				return ERROR;  // zwroc BLAD
+			case ERROR: 
+				return ERROR;  
 		}
 	}
 
@@ -170,9 +170,9 @@ int CONP::infixToONP(string infix,string &onp)
 int CONP::evaluateONP(std::string onp,long double &result)
 {
 
-	if(onp.length() == 0) // jezeli nie ma nic w buforze wejœciowym
+	if(onp.length() == 0) 
 	{
-		result = 0; // to wynik rowny jest zero
+		result = 0; 
 		return 0;
 	}
 
@@ -182,92 +182,92 @@ int CONP::evaluateONP(std::string onp,long double &result)
 	CStack stack;
 	char buf[256];
 	int res;
-	// dopoki jestesmy w obrebie wyrazenia
+	
 	while(position < onp.length())
 	{
 		res = getNextElement(onp,buffer,position,1);
 
 		switch(res)
 		{
-			case NUMBER: // jezeli napotkamy liczbe
-				stack.push(buffer); // dajemy ja na stos
+			case NUMBER: 
+				stack.push(buffer); 
 				break;
-			case OPERATOR: // jezeli napotkamy operator
-				if(buffer[0] == '+') // i jezeli jest to plus
+			case OPERATOR: 
+				if(buffer[0] == '+') 
 			{
 
-				stack.pop(buffer2); // sciagamy liczbe ze stosu
-				a = atof(buffer2.c_str()); // zamieniamy na double
-				memset(buf,0,256); // zerujemy buf
-				stack.pop(buffer2); // sciagamy druga liczbe ze stosu
-				b = atof(buffer2.c_str()); // zamieniamy na double
-				c = a+b; // wykonujemy dodawanie
-				sprintf_s(buf,"%.15lf",c); // zamieniamy na ciag znakow
+				stack.pop(buffer2); 
+				a = atof(buffer2.c_str()); 
+				memset(buf,0,256); 
+				stack.pop(buffer2); 
+				b = atof(buffer2.c_str()); 
+				c = a+b; 
+				sprintf_s(buf,"%.15lf",c); 
 				buffer2 = buf;
-				stack.push(buffer2);// i z powrotem wkladamy na stos
+				stack.push(buffer2);
 			}
-			if(buffer[0] == '-') // analogiczie dla pozostalych operatorow ...
+			if(buffer[0] == '-') 
 			{
 
-				stack.pop(buffer2); // sciagamy liczbe ze stacku
-				a = atof(buffer2.c_str()); // zamieniamy na double
-				memset(buf,0,256); // zerujemy buf
-				stack.pop(buffer2); // sciagamy druga liczbe ze stacku
-				b = atof(buffer2.c_str()); // zamieniamy na double
-				c = b-a; // wykonujemy dodawanie
-				sprintf_s(buf,"%.15lf",c); // zamieniamy na ciag znakow
+				stack.pop(buffer2); 
+				a = atof(buffer2.c_str()); 
+				memset(buf,0,256); 
+				stack.pop(buffer2); 
+				b = atof(buffer2.c_str()); 
+				c = b-a; 
+				sprintf_s(buf,"%.15lf",c); 
 				buffer2 = buf;
-				stack.push(buffer2);// i z powrotem wkladamy na stack
+				stack.push(buffer2);
 			}
 			if(buffer[0] == '*')
 			{
 
-				stack.pop(buffer2); // sciagamy liczbe ze stacku
-				a = atof(buffer2.c_str()); // zamieniamy na double
-				memset(buf,0,256); // zerujemy buf
-				stack.pop(buffer2); // sciagamy druga liczbe ze stacku
-				b = atof(buffer2.c_str()); // zamieniamy na double
-				c = a*b; // wykonujemy dodawanie
-				sprintf_s(buf,"%.15lf",c); // zamieniamy na ciag znakow
+				stack.pop(buffer2); 
+				a = atof(buffer2.c_str()); 
+				memset(buf,0,256); 
+				stack.pop(buffer2); 
+				b = atof(buffer2.c_str()); 
+				c = a*b; 
+				sprintf_s(buf,"%.15lf",c); 
 				buffer2 = buf;
-				stack.push(buffer2);// i z powrotem wkladamy na stack
+				stack.push(buffer2);
 			}
 			if(buffer[0] == '/')
 			{
 
-				stack.pop(buffer2); // sciagamy liczbe ze stacku
-				a = atof(buffer2.c_str()); // zamieniamy na double
-				memset(buf,0,256); // zerujemy buf
-				stack.pop(buffer2); // sciagamy druga liczbe ze stacku
-				b = atof(buffer2.c_str()); // zamieniamy na double
+				stack.pop(buffer2); 
+				a = atof(buffer2.c_str()); 
+				memset(buf,0,256); 
+				stack.pop(buffer2); 
+				b = atof(buffer2.c_str()); 
 				if(!a)
 					return ERROR;
-				c = b/a; // wykonujemy dodawanie
-				sprintf_s(buf,"%.15lf",c); // zamieniamy na ciag znakow
+				c = b/a; 
+				sprintf_s(buf,"%.15lf",c); 
 				buffer2 = buf;
-				stack.push(buffer2);// i z powrotem wkladamy na stack
+				stack.push(buffer2);
 			}
 			if(buffer[0] == '^')
 			{
-				stack.pop(buffer2); // sciagamy liczbe ze stacku
-				a = atof(buffer2.c_str()); // zamieniamy na double
-				memset(buf,0,256); // zerujemy buf
-				stack.pop(buffer2); // sciagamy druga liczbe ze stacku
-				b = atof(buffer2.c_str()); // zamieniamy na double
-				c = pow(b,a); // wykonujemy dodawanie
-				sprintf_s(buf,"%.15lf",c); // zamieniamy na ciag znakow
+				stack.pop(buffer2); 
+				a = atof(buffer2.c_str()); 
+				memset(buf,0,256); 
+				stack.pop(buffer2); 
+				b = atof(buffer2.c_str()); 
+				c = pow(b,a); 
+				sprintf_s(buf,"%.15lf",c); 
 				buffer2 = buf;
-				stack.push(buffer2);// i z powrotem wkladamy na stack
+				stack.push(buffer2);
 			}
 			break;
-		case ERROR: // jezeli funkcja PobierzOp napotkala ERROR 
-			return ERROR; // zwracamy -1 ERROR
+		case ERROR: 
+			return ERROR; 
 			break;
 		}
 	}
 	
-	stack.pop(buffer2); // sciagamy ostateczny wynik ze stosu
-	result = atof(buffer2.c_str()); // i przypisujemy do zmiennej wynik
+	stack.pop(buffer2); 
+	result = atof(buffer2.c_str()); 
 }
 
 
