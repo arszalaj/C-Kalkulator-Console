@@ -12,7 +12,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	char buf[256];
 	long double result;
 
-	cout<<"Podaj wyrazenie"<<endl;
+	cout<<"Podaj wyrazenie"<<endl<<endl;
 	cin>>infix;
 
 	if(onp.infixToONP(infix,onp_ex) == -1)
@@ -29,7 +29,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		{
 			sprintf_s(buf,"%.15Lf",result);
 			sresult= buf;
-			cout<<"Wynik = "<<sresult<<endl;
+			cout<<endl<<"ONP : "<<onp_ex<<endl;
+			cout<<"Wynik = "<<sresult<<endl<<endl;
 		}
 	}
 	system("PAUSE");
