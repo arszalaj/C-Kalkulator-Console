@@ -17,6 +17,25 @@ CStack::~CStack(void)
 {
 	stack.clear();
 }
+
+/**
+* Zwraca iloœæ elementów na stosie.
+* @return iloœæ elementów (int)
+*/
+int CStack::getActualSize()
+{
+	return stack.size();
+}
+/**
+* Sprawdza, czy stos jest pusty.
+* @return true, je¿eli stos jest pusty, w przeciwnym razie false
+*/
+bool CStack::isEmpty()
+{
+	if(!stack.size())
+		return true;
+	else return false;
+}
 /**
 * K³adzie element na stosie.
 * @param element Element klasy string.

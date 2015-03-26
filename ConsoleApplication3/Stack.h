@@ -15,8 +15,10 @@ public:
 	CStack(void);
 	~CStack(void);
 
+	int getActualSize();
 	void push(string element);
 	bool pop(string &dest);
+	bool isEmpty();
 	bool look(string &bufor);
 
 private:
